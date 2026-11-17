@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>账号密码管家</title>
 <style>
   :root{
@@ -30,6 +30,7 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html{
     height:100%;
+    height:100dvh;
     background:#0A0B14;
     overscroll-behavior:none;
     overflow:hidden;
@@ -481,7 +482,7 @@
       rgba(70,66,150,.26) 62%,
       rgba(110,104,205,.34) 100%);
     display:flex;align-items:center;justify-content:center;
-    padding-bottom:6vh;
+    padding-bottom:env(safe-area-inset-bottom);
     transition:opacity .5s ease, visibility .5s ease;
   }
   #splash.hide{opacity:0;visibility:hidden;pointer-events:none;}
@@ -497,7 +498,7 @@
     animation:logoIn .7s cubic-bezier(.22,.9,.3,1) both, logoGlow 2.4s ease-in-out .8s infinite;
   }
   .splash-logo svg{width:38px;height:38px;display:block;}
-  @keyframes logoIn{from{opacity:0;transform:scale(.7) translateY(14px);}to{opacity:1;transform:scale(1) translateY(0);}}
+  @keyframes logoIn{from{opacity:0;transform:scale(.7);}to{opacity:1;transform:scale(1);}}
   @keyframes logoGlow{
     0%,100%{box-shadow:0 24px 60px -18px rgba(139,124,255,.5), inset 0 0 22px rgba(139,124,255,.07);}
     50%{box-shadow:0 24px 72px -14px rgba(139,124,255,.85), inset 0 0 30px rgba(139,124,255,.14);}
@@ -554,7 +555,7 @@
       rgba(70,66,150,.26) 62%,
       rgba(110,104,205,.34) 100%);
     display:flex;align-items:center;justify-content:center;
-    padding:0 26px 6vh;
+    padding:0 26px env(safe-area-inset-bottom);
   }
   #lockScreen.hide{display:none;}
   .lock-inner{
@@ -741,7 +742,7 @@
   <button class="btn-ghost" id="btnExportTxt">导出为文本文档（TXT）</button>
   <button class="btn-ghost" id="btnImport">从备份文件导入</button>
   <button class="btn-ghost" id="btnTrash">打开回收站</button>
-  <div class="ver-line">当前版本 1.2</div>
+  <div class="ver-line">当前版本 1.2.1</div>
   <input type="file" id="fileInput" accept=".json,application/json" style="display:none;">
   <button class="btn-ghost" id="btnCloseData" style="margin-top:14px;">关闭</button>
 </div>
@@ -1116,7 +1117,7 @@
         '<div class="card-head">' +
           '<div class="avatar" style="background:linear-gradient(145deg,' + grad[0] + ',' + grad[1] + ');">' + esc(initial) + '</div>' +
           '<div class="card-title"><div class="n">' + esc(e.name) + '</div>' +
-          (e.group ? '<div class="g">' + esc(e.group) + '</div>' : '<div class="g">' + accs.length + ' 条账号</div>') + '</div>' +
+          '<div class="g">' + accs.length + ' 条账号</div>' + '</div>' +
           '<div class="card-ops">' +
             '<button class="op-fold" aria-label="折叠或展开"><svg viewBox="0 0 24 24"><path d="M6 9.5l6 6 6-6"/></svg></button>' +
             '<button class="op-pin' + (e.pinned ? " pinned" : "") + '" aria-label="置顶"><svg viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.8-4.5 4.2 1.1 6-5.4-2.9-5.4 2.9 1.1-6L3.2 9.4l6.1-.8z"/></svg></button>' +
