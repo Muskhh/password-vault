@@ -277,10 +277,8 @@
     width:56px;height:56px;border-radius:16px;margin:0 auto 18px;
     background:var(--glass);border:1px solid var(--stroke);
     display:flex;align-items:center;justify-content:center;
-    animation:floaty 3.2s ease-in-out infinite;
   }
   .empty .e-icon svg{width:26px;height:26px;stroke:#B9AFFF;stroke-width:1.6;fill:none;stroke-linecap:round;stroke-linejoin:round;}
-  @keyframes floaty{0%,100%{transform:translateY(0);}50%{transform:translateY(-7px);}}
   .empty p{font-size:12.5px;line-height:1.9;color:var(--text-3);}
 
   .fab{
@@ -498,15 +496,22 @@
     -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
     display:flex;align-items:center;justify-content:center;
     margin-bottom:22px;
-    box-shadow:0 24px 60px -18px rgba(139,124,255,.5), inset 0 0 22px rgba(139,124,255,.07);
+    animation:logoIn .7s cubic-bezier(.22,.9,.3,1) both, logoGlow 2.4s ease-in-out .8s infinite;
   }
   .splash-logo svg{width:38px;height:38px;display:block;}
+  @keyframes logoIn{from{opacity:0;transform:scale(.7) translateY(14px);}to{opacity:1;transform:scale(1) translateY(0);}}
+  @keyframes logoGlow{
+    0%,100%{box-shadow:0 24px 60px -18px rgba(139,124,255,.5), inset 0 0 22px rgba(139,124,255,.07);}
+    50%{box-shadow:0 24px 72px -14px rgba(139,124,255,.85), inset 0 0 30px rgba(139,124,255,.14);}
+  }
   .splash-eyebrow{
     font-size:9px;letter-spacing:.28em;color:var(--text-4);font-weight:600;
     margin-bottom:10px;
+    animation:fadeUp .6s .28s cubic-bezier(.22,.9,.3,1) both;
   }
   .splash-title{
     font-size:24px;font-weight:600;letter-spacing:-.02em;
+    animation:fadeUp .6s .4s cubic-bezier(.22,.9,.3,1) both;
   }
   .splash-title em{
     font-style:normal;
@@ -518,6 +523,7 @@
     width:132px;height:2px;border-radius:1px;
     background:rgba(255,255,255,.08);overflow:hidden;
     margin-top:20px;
+    animation:fadeUp .6s .52s cubic-bezier(.22,.9,.3,1) both;
   }
   .splash-bar i{
     display:block;height:100%;width:100%;
@@ -526,6 +532,7 @@
     animation:barFill 1.2s .55s cubic-bezier(.3,.6,.4,1) forwards;
   }
   @keyframes barFill{to{transform:scaleX(1);}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
   .ver-line{
     margin-top:18px;padding-top:12px;
     border-top:1px dashed rgba(255,255,255,.08);
@@ -602,9 +609,9 @@
   .lock-inner.shake{animation:lockShake .4s ease;}
 
   /* ---------- 动画 ---------- */
-  @keyframes cardIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes cardIn{from{opacity:0;}to{opacity:1;}}
   @keyframes cardOut{to{opacity:0;transform:translateX(36px) scale(.96);}}
-  @keyframes fadeDown{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+  @keyframes fadeDown{from{opacity:0;}to{opacity:1;}}
 
   @media (prefers-reduced-motion: reduce){
     *,*::before,*::after{transition:none !important;animation:none !important;}
@@ -737,7 +744,7 @@
   <button class="btn-ghost" id="btnExportTxt">导出为文本文档（TXT）</button>
   <button class="btn-ghost" id="btnImport">从备份文件导入</button>
   <button class="btn-ghost" id="btnTrash">打开回收站</button>
-  <div class="ver-line">当前版本 1.0</div>
+  <div class="ver-line">当前版本 1.1</div>
   <input type="file" id="fileInput" accept=".json,application/json" style="display:none;">
   <button class="btn-ghost" id="btnCloseData" style="margin-top:14px;">关闭</button>
 </div>
@@ -1037,6 +1044,24 @@
     });
     return m === Infinity ? 0 : m;
   }
+  /* 指定分组已存在时，返回插入到该组末尾的排序值；否则返回 null（走默认排最前） */
+  function groupInsertOrder(groupName){
+    if(!groupName) return null;
+    var mates = entries.filter(function(x){ return (x.group || "") === groupName; });
+    if(!mates.length) return null;
+    var sorted = entries.slice().sort(orderCmp);
+    var lastMate = null, lastIdx = -1;
+    sorted.forEach(function(e, i){
+      if((e.group || "") === groupName){ lastMate = e; lastIdx = i; }
+    });
+    if(!lastMate) return null;
+    var lastOrder = (typeof lastMate.order === "number") ? lastMate.order : null;
+    if(lastOrder === null) return null;
+    var next = (lastIdx + 1 < sorted.length) ? sorted[lastIdx + 1] : null;
+    var nextOrder = next ? ((typeof next.order === "number") ? next.order : Number.MAX_SAFE_INTEGER) : lastOrder + 2;
+    if(nextOrder === Number.MAX_SAFE_INTEGER) return lastOrder + 1;
+    return (lastOrder + nextOrder) / 2;
+  }
 
   function cardHTML(e, idx){
     var grad = avatarGrad(e.name || "A");
@@ -1240,9 +1265,26 @@
         if(!wasActive) return;
         card.classList.remove("dragging");
         card.style.transform = "";
+        /* 拖入其他分组：以落点相邻卡片为准，自动归入该组 */
+        function neighborEntry(node){
+          if(!node) return null;
+          var en = entries.filter(function(x){ return x.id === node.getAttribute("data-id"); })[0];
+          return (en && !!en.pinned === !!entry.pinned) ? en : null;
+        }
+        var adoptGroup = null;
+        var pe = neighborEntry(prevCard());
+        if(pe && (pe.group || "") !== (entry.group || "")) adoptGroup = pe.group || "";
+        else {
+          var ne = neighborEntry(nextCard());
+          if(ne && (ne.group || "") !== (entry.group || "")) adoptGroup = ne.group || "";
+        }
         /* 按拖完的可见顺序写回自定义排序 */
         var seq = area.querySelectorAll(".card");
         var puts = [];
+        if(adoptGroup !== null){
+          entry.group = adoptGroup;
+          puts.push(dbPut(entry));
+        }
         Array.prototype.forEach.call(seq, function(c, i){
           var en = entries.filter(function(x){ return x.id === c.getAttribute("data-id"); })[0];
           if(en && en.order !== i){
@@ -1434,7 +1476,9 @@
     if(!name){ toast("先填一下名称"); return; }
     var now = Date.now();
     if(!platEditingId){
-      var fresh = { id: uid(), name: name, group: $("fPlatGroup").value.trim(), accounts: [], createdAt: now, updatedAt: now, order: minOrder() - 1 };
+      var g = $("fPlatGroup").value.trim();
+      var insertAt = groupInsertOrder(g);
+      var fresh = { id: uid(), name: name, group: g, accounts: [], createdAt: now, updatedAt: now, order: (insertAt !== null) ? insertAt : minOrder() - 1 };
       dbPut(fresh).then(function(){
         hideOverlay();
         toast("已创建平台，点卡片里的「添加账号」录入");
@@ -1447,6 +1491,9 @@
     entry.name = name;
     entry.group = $("fPlatGroup").value.trim();
     entry.updatedAt = now;
+    /* 编辑时归入已有分组：挪到该组末尾，保证分组不被拆散 */
+    var moveTo = groupInsertOrder(entry.group);
+    if(moveTo !== null) entry.order = moveTo;
     dbPut(entry).then(function(){
       hideOverlay();
       toast("已保存");
