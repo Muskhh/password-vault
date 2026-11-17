@@ -1878,6 +1878,21 @@
     $("listArea").innerHTML = '<div class="empty"><p>本地数据库初始化失败<br>请确认浏览器允许本地存储后刷新重试</p></div>';
   });
 })();
+
+/* ---------- 离线缓存：注册 + 新版自动刷新 ---------- */
+if(location.protocol === "https:" && "serviceWorker" in navigator){
+  navigator.serviceWorker.register("./sw.js", {updateViaCache:"none"}).then(function(reg){
+    reg.addEventListener("updatefound", function(){
+      var nw = reg.installing;
+      if(!nw) return;
+      nw.addEventListener("statechange", function(){
+        if(nw.state === "activated" && navigator.serviceWorker.controller){
+          location.reload();
+        }
+      });
+    });
+  }).catch(function(){});
+}
 </script>
 </body>
 </html>
