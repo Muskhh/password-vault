@@ -30,7 +30,6 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html{
     height:100%;
-    height:100dvh;
     background:#0A0B14;
     overscroll-behavior:none;
     overflow:hidden;
@@ -742,7 +741,7 @@
   <button class="btn-ghost" id="btnExportTxt">导出为文本文档（TXT）</button>
   <button class="btn-ghost" id="btnImport">从备份文件导入</button>
   <button class="btn-ghost" id="btnTrash">打开回收站</button>
-  <div class="ver-line">当前版本 1.2.1</div>
+  <div class="ver-line">当前版本 1.2.2</div>
   <input type="file" id="fileInput" accept=".json,application/json" style="display:none;">
   <button class="btn-ghost" id="btnCloseData" style="margin-top:14px;">关闭</button>
 </div>
@@ -1745,11 +1744,29 @@
   (function(){
     var splash = document.getElementById("splash");
     var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    setTimeout(function(){
-      splash.classList.add("hide");
-      document.body.classList.remove("splash-on");
-      setTimeout(function(){ splash.classList.add("gone"); }, reduce ? 80 : 540);
-    }, reduce ? 350 : 1900);
+    var MIN_SHOW = reduce ? 350 : 1900;   /* 最短展示时长，体验不变 */
+    var QUIET = 350;                       /* 视口静默 350ms 才算定下来 */
+    var HARD_CAP = 8000;                   /* 兜底：最多等 8 秒强制收起 */
+    var t0 = Date.now();
+    var lastViewportChange = 0;
+    function onViewChange(){ lastViewportChange = Date.now(); }
+    if(window.visualViewport && window.visualViewport.addEventListener){
+      window.visualViewport.addEventListener("resize", onViewChange);
+    }
+    window.addEventListener("resize", onViewChange);
+    window.addEventListener("orientationchange", onViewChange);
+    (function tryHide(){
+      var now = Date.now();
+      var elapsed = now - t0;
+      var quiet = now - lastViewportChange;
+      if(elapsed >= MIN_SHOW && (quiet >= QUIET || elapsed >= HARD_CAP)){
+        splash.classList.add("hide");
+        document.body.classList.remove("splash-on");
+        setTimeout(function(){ splash.classList.add("gone"); }, reduce ? 80 : 540);
+        return;
+      }
+      setTimeout(tryHide, 80);
+    })();
   })();
 
   /* ---------- 密码解锁 ---------- */

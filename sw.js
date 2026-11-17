@@ -1,4 +1,4 @@
-var CACHE_NAME = 'password-vault-pwa-v11';
+var CACHE_NAME = 'password-vault-pwa-v12';
 var ASSETS = [
   './',
   './index.html',
