@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <title>账号密码管家</title>
 <style>
   :root{
@@ -475,17 +475,22 @@
   #splash{
     position:fixed;left:0;right:0;top:0;height:100vh;height:100lvh;overflow:hidden;z-index:200;
     background:#0A0B14;
-    background-image:linear-gradient(168deg,
+    display:flex;align-items:center;justify-content:center;
+    transition:opacity .5s ease, visibility .5s ease;
+  }
+  #splash::before{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(168deg,
       rgba(139,124,255,.42) 0%,
       rgba(88,82,180,.20) 30%,
       rgba(70,66,150,.26) 62%,
       rgba(110,104,205,.34) 100%);
-    display:flex;align-items:center;justify-content:center;
-    transition:opacity .5s ease, visibility .5s ease;
+    opacity:0;animation:splashReveal .3s ease .3s forwards;
   }
   #splash.hide{opacity:0;visibility:hidden;pointer-events:none;}
   #splash.gone{display:none;}
-  .splash-inner{display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 32px;}
+  .splash-inner{display:flex;flex-direction:column;align-items:center;text-align:center;padding:0 32px;opacity:0;animation:splashReveal .3s ease .32s forwards;}
+  @keyframes splashReveal{to{opacity:1;}}
   .splash-logo{
     width:84px;height:84px;border-radius:22px;
     background:var(--glass);
@@ -493,7 +498,7 @@
     -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
     display:flex;align-items:center;justify-content:center;
     margin-bottom:22px;
-    animation:logoIn .7s cubic-bezier(.22,.9,.3,1) both, logoGlow 2.4s ease-in-out .8s infinite;
+    animation:logoIn .7s .32s cubic-bezier(.22,.9,.3,1) both, logoGlow 2.4s ease-in-out 1.12s infinite;
   }
   .splash-logo svg{width:38px;height:38px;display:block;}
   @keyframes logoIn{from{opacity:0;transform:scale(.7);}to{opacity:1;transform:scale(1);}}
@@ -504,11 +509,11 @@
   .splash-eyebrow{
     font-size:9px;letter-spacing:.28em;color:var(--text-4);font-weight:600;
     margin-bottom:10px;
-    animation:fadeUp .6s .28s cubic-bezier(.22,.9,.3,1) both;
+    animation:fadeUp .6s .6s cubic-bezier(.22,.9,.3,1) both;
   }
   .splash-title{
     font-size:24px;font-weight:600;letter-spacing:-.02em;
-    animation:fadeUp .6s .4s cubic-bezier(.22,.9,.3,1) both;
+    animation:fadeUp .6s .72s cubic-bezier(.22,.9,.3,1) both;
   }
   .splash-title em{
     font-style:normal;
@@ -520,7 +525,7 @@
     width:132px;height:2px;border-radius:1px;
     background:rgba(255,255,255,.08);overflow:hidden;
     margin-top:20px;
-    animation:fadeUp .6s .52s cubic-bezier(.22,.9,.3,1) both;
+    animation:fadeUp .6s .84s cubic-bezier(.22,.9,.3,1) both;
   }
   .splash-bar i{
     display:block;height:100%;width:100%;
@@ -741,7 +746,7 @@
   <button class="btn-ghost" id="btnExportTxt">导出为文本文档（TXT）</button>
   <button class="btn-ghost" id="btnImport">从备份文件导入</button>
   <button class="btn-ghost" id="btnTrash">打开回收站</button>
-  <div class="ver-line">当前版本 1.2.4</div>
+  <div class="ver-line">当前版本 1.2.5</div>
   <input type="file" id="fileInput" accept=".json,application/json" style="display:none;">
   <button class="btn-ghost" id="btnCloseData" style="margin-top:14px;">关闭</button>
 </div>
