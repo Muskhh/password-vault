@@ -4,23 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
 <title>账号密码管家</title>
-<link rel="manifest" href="manifest.json">
-<link rel="icon" type="image/png" href="icon-192.png">
-<link rel="apple-touch-icon" href="icon-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="密码管家">
-<meta name="theme-color" content="#07080D">
-<script>
-(function(){
-  if(location.protocol!=='https:' && location.hostname!=='localhost')return;
-  try{
-    if('serviceWorker' in navigator){
-      navigator.serviceWorker.register('./sw.js').catch(function(){});
-    }
-  }catch(e){}
-})();
-</script>
 <style>
   :root{
     --bg:#08090E;
@@ -45,20 +28,25 @@
     --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
   }
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
-  html,body{height:100%;}
-  body{
-    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
+  html{
+    height:100%;
     background:#08090E;
     background-image:
       radial-gradient(120% 60% at 12% -6%, rgba(139,124,255,.40), transparent 62%),
       radial-gradient(90% 50% at 96% 6%, rgba(70,217,196,.20), transparent 60%),
       radial-gradient(80% 46% at 50% 106%, rgba(139,124,255,.18), transparent 64%);
-    background-attachment:fixed;
+    overscroll-behavior:none;
+    overflow:hidden;
+  }
+  body{
+    position:fixed;top:0;left:0;right:0;bottom:0;
+    overflow-y:auto;overflow-x:hidden;
+    -webkit-overflow-scrolling:touch;
+    overscroll-behavior:none;
+    font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans SC","Microsoft YaHei",sans-serif;
     color:var(--text);
     -webkit-font-smoothing:antialiased;
-    min-height:100vh;
     padding-bottom:calc(112px + env(safe-area-inset-bottom));
-    position:relative;
   }
   body::before{display:none;}
   .wrap{max-width:560px;margin:0 auto;padding:0 18px;position:relative;z-index:1;}
@@ -490,7 +478,6 @@
       radial-gradient(120% 60% at 12% -6%, rgba(139,124,255,.42), transparent 62%),
       radial-gradient(90% 50% at 96% 6%, rgba(70,217,196,.22), transparent 60%),
       radial-gradient(80% 46% at 50% 106%, rgba(139,124,255,.20), transparent 64%);
-    background-attachment:fixed;
     display:flex;align-items:center;justify-content:center;
     padding-bottom:6vh;
     transition:opacity .5s ease, visibility .5s ease;
@@ -557,7 +544,6 @@
       radial-gradient(120% 60% at 12% -6%, rgba(139,124,255,.42), transparent 62%),
       radial-gradient(90% 50% at 96% 6%, rgba(70,217,196,.22), transparent 60%),
       radial-gradient(80% 46% at 50% 106%, rgba(139,124,255,.20), transparent 64%);
-    background-attachment:fixed;
     display:flex;align-items:center;justify-content:center;
     padding:0 26px 6vh;
   }
