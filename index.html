@@ -31,17 +31,17 @@
   html{
     height:100%;
     background:#0A0B14;
-    background-image:linear-gradient(168deg,
-      rgba(139,124,255,.42) 0%,
-      rgba(88,82,180,.20) 28%,
-      rgba(23,24,40,0) 55%,
-      rgba(62,60,124,.24) 80%,
-      rgba(139,124,255,.38) 100%);
     overscroll-behavior:none;
     overflow:hidden;
   }
   body{
     position:fixed;top:0;left:0;right:0;bottom:0;
+    background:#0A0B14;
+    background-image:linear-gradient(168deg,
+      rgba(139,124,255,.42) 0%,
+      rgba(88,82,180,.20) 30%,
+      rgba(70,66,150,.26) 62%,
+      rgba(110,104,205,.34) 100%);
     overflow-y:auto;overflow-x:hidden;
     -webkit-overflow-scrolling:touch;
     overscroll-behavior:none;
@@ -311,13 +311,12 @@
     border-bottom:none;
     border-radius:var(--r-2xl) var(--r-2xl) 0 0;
     -webkit-backdrop-filter:blur(26px);backdrop-filter:blur(26px);
-    box-shadow:0 -28px 60px rgba(0,0,0,.65);
     padding:12px 20px calc(24px + env(safe-area-inset-bottom));
     transform:translateY(103%);transition:transform .32s cubic-bezier(.32,.72,.28,1);
     z-index:31;max-height:88vh;overflow-y:auto;
   }
   .sheet::before{display:none;}
-  .sheet.show{transform:translateY(0);}
+  .sheet.show{transform:translateY(0);box-shadow:0 -28px 60px rgba(0,0,0,.65);}
   .sheet .grab{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,.2);margin:2px auto 16px;}
   .sheet h3{font-size:16px;font-weight:600;letter-spacing:0;margin-bottom:16px;display:flex;align-items:baseline;}
   .sheet h3::before{display:none;}
@@ -478,10 +477,9 @@
     background:#0A0B14;
     background-image:linear-gradient(168deg,
       rgba(139,124,255,.42) 0%,
-      rgba(88,82,180,.20) 28%,
-      rgba(23,24,40,0) 55%,
-      rgba(62,60,124,.24) 80%,
-      rgba(139,124,255,.38) 100%);
+      rgba(88,82,180,.20) 30%,
+      rgba(70,66,150,.26) 62%,
+      rgba(110,104,205,.34) 100%);
     display:flex;align-items:center;justify-content:center;
     padding-bottom:6vh;
     transition:opacity .5s ease, visibility .5s ease;
@@ -552,10 +550,9 @@
     background:#0A0B14;
     background-image:linear-gradient(168deg,
       rgba(139,124,255,.42) 0%,
-      rgba(88,82,180,.20) 28%,
-      rgba(23,24,40,0) 55%,
-      rgba(62,60,124,.24) 80%,
-      rgba(139,124,255,.38) 100%);
+      rgba(88,82,180,.20) 30%,
+      rgba(70,66,150,.26) 62%,
+      rgba(110,104,205,.34) 100%);
     display:flex;align-items:center;justify-content:center;
     padding:0 26px 6vh;
   }
@@ -744,7 +741,7 @@
   <button class="btn-ghost" id="btnExportTxt">导出为文本文档（TXT）</button>
   <button class="btn-ghost" id="btnImport">从备份文件导入</button>
   <button class="btn-ghost" id="btnTrash">打开回收站</button>
-  <div class="ver-line">当前版本 1.1</div>
+  <div class="ver-line">当前版本 1.2</div>
   <input type="file" id="fileInput" accept=".json,application/json" style="display:none;">
   <button class="btn-ghost" id="btnCloseData" style="margin-top:14px;">关闭</button>
 </div>
@@ -755,6 +752,18 @@
   <p class="desc">删除的卡片会先放在这里，30 天后自动清空。恢复后回到原来位置。</p>
   <div id="trashList"></div>
   <button class="btn-ghost" id="btnCloseTrash" style="margin-top:14px;">关闭</button>
+</div>
+
+<div class="sheet" id="groupSheet">
+  <div class="grab"></div>
+  <h3><span>修改分组名称</span></h3>
+  <p class="desc">改完名字后，这个分组下的所有平台卡片会一起改成新名称。</p>
+  <div class="form-field">
+    <label>原分组名：<span id="groupOldName"></span></label>
+    <input type="text" id="fGroupName" placeholder="输入新的分组名" maxlength="12" autocomplete="off">
+  </div>
+  <button class="btn-primary" id="btnGroupSave">确认改名</button>
+  <button class="btn-ghost" id="btnGroupCancel">取消</button>
 </div>
 
 <div class="sheet" id="lockSheet">
@@ -1016,7 +1025,7 @@
     var html = "";
     var seq = 0;
     runs.forEach(function(run, gi){
-      html += '<div class="group-head"><span class="g-idx">0' + (gi+1) + '</span><span class="g-name">' + esc(run.label) +
+      html += '<div class="group-head" data-group="' + esc(run.label) + '"><span class="g-idx">0' + (gi+1) + '</span><span class="g-name">' + esc(run.label) +
               '</span><span class="g-line"></span><span class="g-num">' + run.items.length + ' 条</span></div>';
       run.items.forEach(function(e){
         html += cardHTML(e, seq);
@@ -1025,6 +1034,13 @@
     });
     area.innerHTML = html;
     bindCardEvents(area);
+    /* 点分组标题可改名（置顶区除外） */
+    Array.prototype.forEach.call(area.querySelectorAll(".group-head"), function(gh){
+      gh.addEventListener("click", function(){
+        var g = gh.getAttribute("data-group");
+        if(g && g !== "已置顶" && g !== "全部分组") openGroupRename(g);
+      });
+    });
   }
 
   function pad2(n){ return (n < 10 ? "0" : "") + n; }
@@ -1393,6 +1409,7 @@
     $("dataSheet").classList.remove("show");
     $("lockSheet").classList.remove("show");
     $("trashSheet").classList.remove("show");
+    $("groupSheet").classList.remove("show");
   }
   $("overlay").addEventListener("click", hideOverlay);
 
@@ -1501,6 +1518,32 @@
     });
   });
   $("btnPlatCancel").addEventListener("click", hideOverlay);
+
+  /* ---------- 分组改名（同步该组全部卡片） ---------- */
+  var groupEditingOld = null;
+  function openGroupRename(oldName){
+    groupEditingOld = oldName;
+    $("groupOldName").textContent = oldName;
+    $("fGroupName").value = oldName;
+    $("groupSheet").classList.add("show");
+    showOverlay();
+    setTimeout(function(){ $("fGroupName").focus(); }, 320);
+  }
+  $("btnGroupSave").addEventListener("click", function(){
+    var newName = $("fGroupName").value.trim();
+    if(!newName){ toast("分组名不能为空"); return; }
+    if(!groupEditingOld || newName === groupEditingOld){ hideOverlay(); return; }
+    var puts = [];
+    entries.forEach(function(e){
+      if((e.group || "") === groupEditingOld){ e.group = newName; puts.push(dbPut(e)); }
+    });
+    Promise.all(puts).then(function(){
+      hideOverlay();
+      toast("已改名为「" + newName + "」，共更新 " + puts.length + " 张卡片");
+      refreshFromDB();
+    });
+  });
+  $("btnGroupCancel").addEventListener("click", hideOverlay);
 
   /* ---------- data sheet ---------- */
   function renderSwitch(){
