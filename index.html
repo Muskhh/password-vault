@@ -30,11 +30,13 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html{
     height:100%;
-    background:#08090E;
-    background-image:
-      radial-gradient(120% 60% at 12% -6%, rgba(139,124,255,.40), transparent 62%),
-      radial-gradient(90% 50% at 96% 6%, rgba(70,217,196,.20), transparent 60%),
-      radial-gradient(95% 55% at 50% 104%, rgba(139,124,255,.30), transparent 68%);
+    background:#0A0B14;
+    background-image:linear-gradient(168deg,
+      rgba(139,124,255,.42) 0%,
+      rgba(88,82,180,.20) 28%,
+      rgba(23,24,40,0) 55%,
+      rgba(62,60,124,.24) 80%,
+      rgba(139,124,255,.38) 100%);
     overscroll-behavior:none;
     overflow:hidden;
   }
@@ -475,11 +477,13 @@
   /* ---------- 进场动画 ---------- */
   #splash{
     position:fixed;inset:0;z-index:200;
-    background:#08090E;
-    background-image:
-      radial-gradient(120% 60% at 12% -6%, rgba(139,124,255,.42), transparent 62%),
-      radial-gradient(90% 50% at 96% 6%, rgba(70,217,196,.22), transparent 60%),
-      radial-gradient(95% 55% at 50% 104%, rgba(139,124,255,.28), transparent 68%);
+    background:#0A0B14;
+    background-image:linear-gradient(168deg,
+      rgba(139,124,255,.42) 0%,
+      rgba(88,82,180,.20) 28%,
+      rgba(23,24,40,0) 55%,
+      rgba(62,60,124,.24) 80%,
+      rgba(139,124,255,.38) 100%);
     display:flex;align-items:center;justify-content:center;
     padding-bottom:6vh;
     transition:opacity .5s ease, visibility .5s ease;
@@ -494,22 +498,15 @@
     -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
     display:flex;align-items:center;justify-content:center;
     margin-bottom:22px;
-    animation:logoIn .7s cubic-bezier(.22,.9,.3,1) both, logoGlow 2.4s ease-in-out .8s infinite;
+    box-shadow:0 24px 60px -18px rgba(139,124,255,.5), inset 0 0 22px rgba(139,124,255,.07);
   }
   .splash-logo svg{width:38px;height:38px;display:block;}
-  @keyframes logoIn{from{opacity:0;transform:scale(.78);}to{opacity:1;transform:scale(1);}}
-  @keyframes logoGlow{
-    0%,100%{box-shadow:0 24px 60px -18px rgba(139,124,255,.5), inset 0 0 22px rgba(139,124,255,.07);}
-    50%{box-shadow:0 24px 72px -14px rgba(139,124,255,.85), inset 0 0 30px rgba(139,124,255,.14);}
-  }
   .splash-eyebrow{
     font-size:9px;letter-spacing:.28em;color:var(--text-4);font-weight:600;
     margin-bottom:10px;
-    animation:fadeUp .6s .28s cubic-bezier(.22,.9,.3,1) both;
   }
   .splash-title{
     font-size:24px;font-weight:600;letter-spacing:-.02em;
-    animation:fadeUp .6s .4s cubic-bezier(.22,.9,.3,1) both;
   }
   .splash-title em{
     font-style:normal;
@@ -521,7 +518,6 @@
     width:132px;height:2px;border-radius:1px;
     background:rgba(255,255,255,.08);overflow:hidden;
     margin-top:20px;
-    animation:fadeUp .6s .52s cubic-bezier(.22,.9,.3,1) both;
   }
   .splash-bar i{
     display:block;height:100%;width:100%;
@@ -530,7 +526,12 @@
     animation:barFill 1.2s .55s cubic-bezier(.3,.6,.4,1) forwards;
   }
   @keyframes barFill{to{transform:scaleX(1);}}
-  @keyframes fadeUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+  .ver-line{
+    margin-top:18px;padding-top:12px;
+    border-top:1px dashed rgba(255,255,255,.08);
+    text-align:center;
+    font-size:9.5px;letter-spacing:.18em;color:var(--text-4);
+  }
   body.splash-on{overflow:hidden;}
   body.splash-on header.top,
   body.splash-on .search-area,
@@ -541,11 +542,13 @@
   /* ---------- 密码解锁 ---------- */
   #lockScreen{
     position:fixed;inset:0;z-index:210;
-    background:#08090E;
-    background-image:
-      radial-gradient(120% 60% at 12% -6%, rgba(139,124,255,.42), transparent 62%),
-      radial-gradient(90% 50% at 96% 6%, rgba(70,217,196,.22), transparent 60%),
-      radial-gradient(95% 55% at 50% 104%, rgba(139,124,255,.28), transparent 68%);
+    background:#0A0B14;
+    background-image:linear-gradient(168deg,
+      rgba(139,124,255,.42) 0%,
+      rgba(88,82,180,.20) 28%,
+      rgba(23,24,40,0) 55%,
+      rgba(62,60,124,.24) 80%,
+      rgba(139,124,255,.38) 100%);
     display:flex;align-items:center;justify-content:center;
     padding:0 26px 6vh;
   }
@@ -734,6 +737,7 @@
   <button class="btn-ghost" id="btnExportTxt">导出为文本文档（TXT）</button>
   <button class="btn-ghost" id="btnImport">从备份文件导入</button>
   <button class="btn-ghost" id="btnTrash">打开回收站</button>
+  <div class="ver-line">当前版本 1.0</div>
   <input type="file" id="fileInput" accept=".json,application/json" style="display:none;">
   <button class="btn-ghost" id="btnCloseData" style="margin-top:14px;">关闭</button>
 </div>
